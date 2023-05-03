@@ -3,10 +3,13 @@
 
 #include <driver/uart.h>
 
-#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "1.0.1"
+#include <trackle_modbus.h>
+
+#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "1.1.0"
 
 void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin);
 void GwMasterModbus_stop();
 bool GwMasterModbus_saveConfigToFlash();
+ModbusError GwMasterModbus_forwardMbReqToSlaves(TrackleModbusFunction function, uint8_t slaveAddr, uint16_t regId, uint16_t size, void *value);
 
 #endif

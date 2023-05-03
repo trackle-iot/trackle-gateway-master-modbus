@@ -4,6 +4,8 @@
 #include <esp_types.h>
 #include <driver/uart.h>
 
+#include <trackle_modbus.h>
+
 typedef enum
 {
     RegError_OK = 0,
@@ -27,5 +29,6 @@ RegError_t MbRtu_writeTypedRegisterByName(char *regName, char *valueString);
 RegError_t MbRtu_writeRawRegisterByAddr(uint8_t writeFunction, uint8_t slaveAddr, uint16_t regId, uint16_t value);
 bool MbRtu_readAllRegistersJson(char *publishString, int publishStringMaxLen);
 void MbRtu_stop();
+ModbusError MbRtu_forwardRequestToSlaves(TrackleModbusFunction function, uint8_t slaveAddr, uint16_t regId, uint16_t size, void *value);
 
 #endif

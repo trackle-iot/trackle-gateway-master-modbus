@@ -47,3 +47,8 @@ bool GwMasterModbus_saveConfigToFlash()
 {
     return NvsFwCfg_saveToNvs();
 }
+
+ModbusError GwMasterModbus_forwardMbReqToSlaves(TrackleModbusFunction function, uint8_t slaveAddr, uint16_t regId, uint16_t size, void *value)
+{
+    return MbRtu_forwardRequestToSlaves(function, slaveAddr, regId, size, value);
+}

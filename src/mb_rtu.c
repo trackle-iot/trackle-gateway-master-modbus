@@ -9,7 +9,6 @@
 #include <freertos/task.h>
 
 #include <trackle_esp32.h>
-#include <trackle_modbus.h>
 
 #include "sem_utils.h"
 #include "str_utils.h"
@@ -443,4 +442,15 @@ RegError_t MbRtu_writeRawRegisterByAddr(uint8_t writeFunction, uint8_t slaveAddr
 void MbRtu_stop()
 {
     BLOCKING_LOCK_OR_ABORT(mbSem);
+}
+
+ModbusError MbRtu_forwardRequestToSlaves(TrackleModbusFunction function, uint8_t slaveAddr, uint16_t regId, uint16_t size, void *value)
+{
+    BLOCKING_LOCK_OR_ABORT(mbSem);
+
+    ModbusError err = Trackle_Modbus_execute_command(function, slaveAddr, regId, size, &value);
+    vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
+
+    UNLOCK_OR_ABORT(mbSem);
+    return err;
 }
