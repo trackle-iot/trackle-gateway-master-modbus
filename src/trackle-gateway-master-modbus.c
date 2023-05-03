@@ -42,3 +42,8 @@ void GwMasterModbus_stop()
 {
     MbRtu_stop();
 }
+
+bool GwMasterModbus_saveConfigToFlash()
+{
+    return NvsFwCfg_saveToNvs();
+}

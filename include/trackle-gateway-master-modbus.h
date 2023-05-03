@@ -3,9 +3,10 @@
 
 #include <driver/uart.h>
 
-#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "0.2.0"
+#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "1.0.0"
 
 void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin);
 void GwMasterModbus_stop();
+bool GwMasterModbus_saveConfigToFlash();
 
 #endif
