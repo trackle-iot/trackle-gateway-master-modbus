@@ -566,13 +566,6 @@ static int postSetMbReadPeriod(const char *args)
     return 1;
 }
 
-static int postSaveConfigToFlash(const char *args)
-{
-    if (!NvsFwCfg_saveToNvs())
-        return -1;
-    return 1;
-}
-
 static int postWriteRegisterValue(const char *args)
 {
     if (strlen(args) >= ARGS_BUFSIZE)
@@ -1049,7 +1042,6 @@ void CloudCb_registerCallbacks()
     tracklePost(trackle_s, "SetMbConfig", postSetMbConfig, ALL_USERS);
     tracklePost(trackle_s, "SetMbInterCmdsDelayMs", postSetMbInterCmdsDelayMs, ALL_USERS);
     tracklePost(trackle_s, "SetMbReadPeriod", postSetMbReadPeriod, ALL_USERS);
-    tracklePost(trackle_s, "SaveConfigToFlash", postSaveConfigToFlash, ALL_USERS);
 
     trackleGet(trackle_s, "GetRegistersList", getGetRegistersList, VAR_JSON);
     trackleGet(trackle_s, "GetRegisterDetails", getGetRegisterDetails, VAR_JSON);
