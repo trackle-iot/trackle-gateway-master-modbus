@@ -20,11 +20,11 @@ Furthermore, registers can be monitored for change (register must be already mon
 
 If Modbus slave address and register ID are known, one can read and write a register by calling `ReadRawRegisterValue` and `WriteRawRegisterValue` without adding them with `AddRegister`. Obviously, in this case, the read and write operations can be performed only with raw 16bit unsigned integers as values, since the type of the register's content is not known to the system.
 
-To set Modbus details, methods `SetMb...` can be used. In order to make them effective, `SaveConfigToFlash` must be called, and device must be restarted.
+To set Modbus details, methods `SetMb...` can be used. In order to make them effective, they must be saved to flash with `GwMasterModbus_saveConfigToFlash` and the device must restart.
 
 Changes applied to registers are applied immediately, without the need to save to flash and restart.
 
-`SaveConfigToFlash` also saves configurations about registers.
+`GwMasterModbus_saveConfigToFlash` also saves configuration about registers.
 
 ## Registers types
 
@@ -323,18 +323,6 @@ Methods available through POST calls.
   * 1:  success;
   * -1: delay parameter is not a valid 16 bit unsigned integer;
   * -2: delay parameter is not positive.
-
-#### SaveConfigToFlash
-* Description:
-  * Save configuration (registers and Modbus RTU details) to flash.
-* Argument format:
-  * none
-* Parameters:
-  * none
-* Return values:
-  * 1:  success;
-  * -1: error while saving to flash.
-
 
 ### GET
 Methods available through GET calls.
