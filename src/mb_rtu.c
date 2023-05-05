@@ -71,10 +71,17 @@ static bool rawToString(uint16_t *num, char *valueString, int valueStringBuffLen
 
 static bool stringBufferToString(uint16_t *num, const RegisterAccessData_t *rad, char *valueString, int valueStringBuffLen)
 {
-    char tempValueString[VALUE_STRING_LEN] = {0};
-    memcpy(tempValueString, num, rad->regNumber * 2); // copy bytes (2 per register) to dest buffer
+    uint16_t orderedRegisters[VALUE_STRING_LEN] = {0};
 
-    if (snprintf(valueString, valueStringBuffLen, "\"%s\"", tempValueString) > valueStringBuffLen - NULL_CHAR_LEN)
+    if (mbBitPosition == 0)
+        memcpy(orderedRegisters, num, rad->regNumber * 2); // copy bytes (2 per register) to dest buffer
+    else if (mbBitPosition == 1)
+    {
+        for (int i = 0; i < rad->regNumber; i++)
+            orderedRegisters[i] = num[rad->regNumber - i - 1];
+    }
+
+    if (snprintf(valueString, valueStringBuffLen, "\"%s\"", (char *)orderedRegisters) > valueStringBuffLen - NULL_CHAR_LEN)
         return false;
     return true;
 }

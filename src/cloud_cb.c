@@ -878,7 +878,7 @@ static char *bitPositionToString(uint8_t position)
     case 0:
         return "MSB";
     case 1:
-        return "MSB";
+        return "LSB";
     default:
         return "invalid";
     }
