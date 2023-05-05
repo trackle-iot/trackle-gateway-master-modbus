@@ -448,7 +448,7 @@ ModbusError MbRtu_forwardRequestToSlaves(TrackleModbusFunction function, uint8_t
 {
     BLOCKING_LOCK_OR_ABORT(mbSem);
 
-    ModbusError err = Trackle_Modbus_execute_command(function, slaveAddr, regId, size, &value);
+    ModbusError err = Trackle_Modbus_execute_command(function, slaveAddr, regId, size, value);
     vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
 
     UNLOCK_OR_ABORT(mbSem);
