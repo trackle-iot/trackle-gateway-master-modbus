@@ -19,7 +19,8 @@
         .modbusReadPeriod = 1,               \
         .serialDataBits = UART_DATA_8_BITS,  \
         .serialParity = UART_PARITY_DISABLE, \
-        .serialStopBits = UART_STOP_BITS_1   \
+        .serialStopBits = UART_STOP_BITS_1,  \
+        .bitPosition = 0                     \
     }
 
 static const char *TAG = "nvs_fw_cfg";

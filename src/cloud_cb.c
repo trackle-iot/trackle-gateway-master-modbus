@@ -583,9 +583,9 @@ static int postSetMbConfig(const char *args)
                 if (tokensNum >= 5)
                 {
                     int8_t bitPosition = -1;
-                    if (STREQ(tokens[5], "msb"))
+                    if (STREQ(tokens[4], "msb"))
                         bitPosition = 0;
-                    else if (STREQ(tokens[5], "lsb"))
+                    else if (STREQ(tokens[4], "lsb"))
                         bitPosition = 1;
                     else
                         return -9;
