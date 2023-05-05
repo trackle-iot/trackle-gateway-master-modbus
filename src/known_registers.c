@@ -270,7 +270,7 @@ bool KnownRegisters_setInterpretedAsSigned(char *regName, bool asSigned)
 bool KnownRegisters_setFactor(char *regName, double factor)
 {
     RegisterAccessData_t *rad = queueFind(&inUseSlots, regName);
-    if (rad != NULL && factor != 0 && rad->type == RADType_NUMBER)
+    if (rad != NULL && factor != 0 && (rad->type == RADType_NUMBER || rad->type == RADType_FLOAT))
     {
         rad->factor = factor;
         return true;
@@ -281,7 +281,7 @@ bool KnownRegisters_setFactor(char *regName, double factor)
 bool KnownRegisters_setOffset(char *regName, double offset)
 {
     RegisterAccessData_t *rad = queueFind(&inUseSlots, regName);
-    if (rad != NULL && rad->type == RADType_NUMBER)
+    if (rad != NULL && (rad->type == RADType_NUMBER || rad->type == RADType_FLOAT))
     {
         rad->offset = offset;
         return true;
@@ -292,11 +292,54 @@ bool KnownRegisters_setOffset(char *regName, double offset)
 bool KnownRegisters_setDecimals(char *regName, uint8_t decimals)
 {
     RegisterAccessData_t *rad = queueFind(&inUseSlots, regName);
-    if (rad != NULL && rad->type == RADType_NUMBER)
+    if (rad != NULL && (rad->type == RADType_NUMBER || rad->type == RADType_FLOAT))
     {
         rad->decimals = decimals;
         return true;
     }
+    return false;
+}
+
+bool KnownRegisters_setLength(char *regName, uint8_t length)
+{
+    RegisterAccessData_t *rad = queueFind(&inUseSlots, regName);
+    if (rad != NULL)
+    {
+
+        // TODO CHECK read function if is single register exit!!!
+        if (rad->type == RADType_NUMBER || rad->type == RADType_FLOAT)
+        {
+            // for number between 1 and 4
+            if (length >= 1 && length <= 4)
+            {
+                rad->regNumber = length;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else if (rad->type == RADType_STRING)
+        {
+            // for number between 1 and 10
+            if (length >= 1 && length <= 10)
+            {
+                rad->regNumber = length;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            // RAW or other
+            return false;
+        }
+
+        return true;
+    }
+
     return false;
 }
 

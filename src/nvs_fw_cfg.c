@@ -108,6 +108,11 @@ void NvsFwCfg_setMbDataBits(uart_word_length_t dataBits)
     nextFirmwareConfig.serialDataBits = dataBits;
 }
 
+void NvsFwCfg_setMbBitPosition(int8_t bitPosition)
+{
+    nextFirmwareConfig.bitPosition = bitPosition;
+}
+
 void NvsFwCfg_setMbReadPeriod(uint8_t period)
 {
     nextFirmwareConfig.modbusReadPeriod = period;

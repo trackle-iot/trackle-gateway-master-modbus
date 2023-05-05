@@ -6,13 +6,18 @@
 
 #define TYPE_NUMBER_STR "number"
 #define TYPE_RAW_STR "raw"
+#define TYPE_FLOAT_STR "float"
+#define TYPE_STRING_STR "string"
 
 #define MAX_REG_NAME_SIZE 20
+#define MAX_REG_LENGTH 10
 
 typedef enum
 {
     RADType_NUMBER,
-    RADType_RAW
+    RADType_RAW,
+    RADType_FLOAT,
+    RADType_STRING,
 } RADType_t;
 
 typedef uint32_t Seconds_t;
@@ -27,6 +32,7 @@ typedef struct RegisterAccessData_s
     bool writable;
     uint8_t readFunction;
     uint8_t writeFunction;
+    uint8_t regNumber; // default 1, max 4 for number, 2 or 4 for float, 10 for string
 
     // Monitoring fields
     bool monitored;

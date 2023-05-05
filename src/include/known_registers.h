@@ -19,6 +19,7 @@ bool KnownRegisters_setInterpretedAsSigned(char *regName, bool asSigned);
 bool KnownRegisters_setFactor(char *regName, double factor);
 bool KnownRegisters_setOffset(char *regName, double offset);
 bool KnownRegisters_setDecimals(char *regName, uint8_t decimals);
+bool KnownRegisters_setLength(char *regName, uint8_t length);
 bool KnownRegisters_setOnChange(char *regName, bool onChange);
 bool KnownRegisters_setChangeCheckInterval(char *regName, Seconds_t changeCheckInterval);
 bool KnownRegisters_setMaxPublishDelay(char *regName, Seconds_t maxPublishDelay);

@@ -4,3 +4,5 @@
 test/
 lib/
 components/
+/test/node_modules
+/test/.env

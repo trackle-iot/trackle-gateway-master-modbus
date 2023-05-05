@@ -25,7 +25,7 @@
 #define JSON_BUFSIZE 1024
 #define VALUE_STRING_BUFSIZE 128
 #define KEYVALUE_STRING_BUFSIZE 144
-#define MAX_TOKENS_NUM 5
+#define MAX_TOKENS_NUM 6
 
 #define INVALID_CONVERSION 127
 
@@ -76,9 +76,22 @@ static int postAddRegister(const char *args)
         rad.factor = 1;
     }
     else if (STREQ(tokens[4], TYPE_RAW_STR))
+    {
         rad.type = RADType_RAW;
+    }
+    else if (STREQ(tokens[4], TYPE_FLOAT_STR))
+    {
+        rad.type = RADType_FLOAT;
+        rad.factor = 1;
+    }
+    else if (STREQ(tokens[4], TYPE_STRING_STR))
+    {
+        rad.type = RADType_STRING;
+    }
     else
         return -9;
+
+    rad.regNumber = 1; // default
 
     if (!KnownRegisters_add(&rad))
         return -10;
@@ -438,6 +451,37 @@ static int postSetRegisterDecimals(const char *args)
     return 1;
 }
 
+static int postSetRegisterLength(const char *args)
+{
+    if (strlen(args) >= ARGS_BUFSIZE)
+        return -1;
+
+    char argsCpy[ARGS_BUFSIZE];
+    strcpy(argsCpy, args);
+
+    char *tokens[MAX_TOKENS_NUM] = {0};
+    int tokensNum = 0;
+    switch (splitInPlace(argsCpy, ',', tokens, MAX_TOKENS_NUM, &tokensNum))
+    {
+    case SplitRes_TOO_MANY_PARAMS:
+        return -2;
+    case SplitRes_NULL_STRIN:
+        return -3;
+    default:
+        if (tokensNum != 2)
+            return -4;
+    }
+
+    const char *regName = tokens[0];
+    uint8_t regLen = 0;
+    sscanf(tokens[1], "%" PRIu8, &regLen);
+
+    if (!KnownRegisters_setLength(regName, regLen))
+        return -6;
+
+    return 1;
+}
+
 static uart_parity_t stringToParity(char *parity)
 {
     // parity err is error
@@ -535,6 +579,32 @@ static int postSetMbConfig(const char *args)
                 if (stopBits == INVALID_CONVERSION)
                     return -8;
                 NvsFwCfg_setMbStopBits(stopBits);
+
+                if (tokensNum >= 5)
+                {
+                    bool onRS485 = false;
+                    if (STREQ(tokens[4], "false"))
+                        onRS485 = false;
+                    else if (STREQ(tokens[4], "true"))
+                        onRS485 = true;
+                    else
+                        return -9;
+
+                    NvsFwCfg_setMbOnRS485(onRS485);
+                }
+
+                if (tokensNum >= 5)
+                {
+                    int8_t bitPosition = -1;
+                    if (STREQ(tokens[5], "msb"))
+                        bitPosition = 0;
+                    else if (STREQ(tokens[5], "lsb"))
+                        bitPosition = 1;
+                    else
+                        return -10;
+
+                    NvsFwCfg_setMbBitPosition(bitPosition);
+                }
             }
         }
     }
@@ -703,6 +773,7 @@ static void *getGetRegisterDetails(const char *args)
         json += sprintf(json, "\"address\":%" PRIu8 ",", rad.slaveAddr);
         json += sprintf(json, "\"register\":%" PRIu16 ",", rad.regId);
         json += sprintf(json, "\"readFunction\":%" PRIu8 ",", rad.readFunction);
+        json += sprintf(json, "\"length\":%" PRIu8 ",", rad.regNumber);
         switch (rad.type)
         {
         case RADType_NUMBER:
@@ -714,6 +785,12 @@ static void *getGetRegisterDetails(const char *args)
             break;
         case RADType_RAW:
             json += sprintf(json, "\"type\":\"" TYPE_RAW_STR "\",");
+            break;
+        case RADType_FLOAT:
+            json += sprintf(json, "\"type\":\"" TYPE_FLOAT_STR "\",");
+            break;
+        case RADType_STRING:
+            json += sprintf(json, "\"type\":\"" TYPE_STRING_STR "\",");
             break;
         }
         json += sprintf(json, "\"monitored\":%s,", BOOL2STR(rad.monitored));
@@ -807,6 +884,19 @@ static char *parityToString(uint8_t parity)
     }
 }
 
+static char *bitPositionToString(uint8_t position)
+{
+    switch (position)
+    {
+    case 0:
+        return "MSB";
+    case 1:
+        return "MSB";
+    default:
+        return "invalid";
+    }
+}
+
 static double stopBitsToDouble(uint8_t stopBits)
 {
     switch (stopBits)
@@ -844,7 +934,8 @@ static void *getGetActualModbusConfig(const char *args)
     json += sprintf(json, "\"readPeriod\":%" PRIu8 ",", fwConfig.modbusReadPeriod);
     json += sprintf(json, "\"dataBits\":%d,", dataBitsToInt(fwConfig.serialDataBits));
     json += sprintf(json, "\"stopBits\":%.2f,", stopBitsToDouble(fwConfig.serialStopBits));
-    json += sprintf(json, "\"parity\":\"%s\"", parityToString(fwConfig.serialParity));
+    json += sprintf(json, "\"parity\":\"%s\",", parityToString(fwConfig.serialParity));
+    json += sprintf(json, "\"bitPosition\":\"%s\"", bitPositionToString(fwConfig.bitPosition));
 
     json += sprintf(json, "}");
 
@@ -1039,6 +1130,7 @@ void CloudCb_registerCallbacks()
     tracklePost(trackle_s, "WriteRawRegisterValue", postWriteRawRegisterValue, ALL_USERS);
     tracklePost(trackle_s, "SetRegisterCoefficients", postSetRegisterCoefficients, ALL_USERS);
     tracklePost(trackle_s, "SetRegisterDecimals", postSetRegisterDecimals, ALL_USERS);
+    tracklePost(trackle_s, "SetRegisterLength", postSetRegisterLength, ALL_USERS);
     tracklePost(trackle_s, "SetMbConfig", postSetMbConfig, ALL_USERS);
     tracklePost(trackle_s, "SetMbInterCmdsDelayMs", postSetMbInterCmdsDelayMs, ALL_USERS);
     tracklePost(trackle_s, "SetMbReadPeriod", postSetMbReadPeriod, ALL_USERS);

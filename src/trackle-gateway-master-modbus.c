@@ -32,7 +32,8 @@ void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs
                     fwConfig.modbusReadPeriod,
                     fwConfig.serialDataBits,
                     fwConfig.serialParity,
-                    fwConfig.serialStopBits))
+                    fwConfig.serialStopBits,
+                    fwConfig.bitPosition))
         ESP_LOGE(TAG, "Invalid modbus parameters. Modbus not started");
 
     CloudCb_registerCallbacks();
