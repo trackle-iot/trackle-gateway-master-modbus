@@ -582,26 +582,13 @@ static int postSetMbConfig(const char *args)
 
                 if (tokensNum >= 5)
                 {
-                    bool onRS485 = false;
-                    if (STREQ(tokens[4], "false"))
-                        onRS485 = false;
-                    else if (STREQ(tokens[4], "true"))
-                        onRS485 = true;
-                    else
-                        return -9;
-
-                    NvsFwCfg_setMbOnRS485(onRS485);
-                }
-
-                if (tokensNum >= 5)
-                {
                     int8_t bitPosition = -1;
                     if (STREQ(tokens[5], "msb"))
                         bitPosition = 0;
                     else if (STREQ(tokens[5], "lsb"))
                         bitPosition = 1;
                     else
-                        return -10;
+                        return -9;
 
                     NvsFwCfg_setMbBitPosition(bitPosition);
                 }
