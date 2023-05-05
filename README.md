@@ -295,12 +295,13 @@ Methods available through POST calls.
 * Description:
   * Set configuration for Modbus RTU.
 * Argument format:
-  * `<baudrate>[,<databits>,<parity>,<stopbits>]`
+  * `<baudrate>[,<databits>,<parity>,<stopbits>,<bitOrder>]`
 * Parameters:
   * `<baudrate>`: unsigned integer representing the baudrate.
   * `<databits>`: either 5,6,7 or 8, bits of data for each word.
   * `<parity>`: `even`, `odd` or `none` parity bit.
   * `<stopbits>`: either 1, 1.5 or 2 stop bits.
+  * `<bitOrder>`: `msb` or `lsb`.
 * Return values:
   * 1:  success;
   * -1: argument too long;
@@ -311,6 +312,7 @@ Methods available through POST calls.
   * -6: invalid data bits;
   * -7: invalid parity;
   * -8: invalid stop bits.
+  * -9: invalid bitorder.
 
 #### SetMbInterCmdsDelayMs
 * Description:
