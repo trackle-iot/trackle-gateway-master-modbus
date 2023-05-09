@@ -21,9 +21,8 @@
 
 #define MON_REGS_TASK_NAME "mon-regs-task"
 #define MON_REGS_TASK_STACKSIZE 8192
-#define MON_REGS_TASK_PRIORITY (tskIDLE_PRIORITY + 3)
+#define MON_REGS_TASK_PRIORITY (tskIDLE_PRIORITY + 6)
 #define MON_REGS_TASK_CORE_ID 0
-#define MON_REGS_TASK_LOOP_MS 1000
 
 #define ROUND_TO_NTH_DECIMAL(v, n) \
     (round(v * pow(10, n)) / pow(10, n))

@@ -5,7 +5,7 @@
 
 #include <trackle_modbus.h>
 
-#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "2.0.0"
+#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "2.0.1"
 
 void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin);
 void GwMasterModbus_stop();
