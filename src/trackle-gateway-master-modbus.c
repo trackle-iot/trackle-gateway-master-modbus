@@ -9,7 +9,7 @@
 
 static const char *TAG = "gw-master-mb";
 
-void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin)
+void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin, void (*mbReqFailedCallback)())
 {
     FirmwareConfig_t fwConfig = {0};
 
@@ -33,7 +33,8 @@ void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs
                     fwConfig.serialDataBits,
                     fwConfig.serialParity,
                     fwConfig.serialStopBits,
-                    fwConfig.bitPosition))
+                    fwConfig.bitPosition,
+                    mbReqFailedCallback))
         ESP_LOGE(TAG, "Invalid modbus parameters. Modbus not started");
 
     CloudCb_registerCallbacks();

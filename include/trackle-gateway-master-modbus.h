@@ -5,9 +5,9 @@
 
 #include <trackle_modbus.h>
 
-#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "2.0.1"
+#define TRACKLE_GATEWAY_MASTER_MODBUS_VERSION "3.0.0"
 
-void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin);
+void GwMasterModbus_init(uart_port_t uartPort, int txPin, int rxPin, bool usesRs485, int dirPin, void (*mbReqFailedCallback)());
 void GwMasterModbus_stop();
 bool GwMasterModbus_saveConfigToFlash();
 ModbusError GwMasterModbus_forwardMbReqToSlaves(TrackleModbusFunction function, uint8_t slaveAddr, uint16_t regId, uint16_t size, void *value);

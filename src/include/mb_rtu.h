@@ -28,7 +28,8 @@ typedef enum
 } RegError_t;
 
 bool MbRtu_init(uart_port_t uartPort, int baudrate, uint8_t txPin, uint8_t rxPin, bool onRS485, uint8_t dirPin, uint16_t mbInterCmdsDelayMs,
-                uint8_t mbReadPeriod, uint8_t serialDataBits, uint8_t serialParity, uint8_t serialStopBits, uint8_t bitPosition);
+                uint8_t mbReadPeriod, uint8_t serialDataBits, uint8_t serialParity, uint8_t serialStopBits, uint8_t bitPosition,
+                void (*mbReqFailedCallback)());
 bool MbRtu_wasStartedSuccesfully();
 RegError_t MbRtu_readTypedRegisterByName(char *regName, char *valueString, int valueStringLen);
 RegError_t MbRtu_readRawRegisterByAddr(uint8_t readFunction, uint8_t slaveAddr, uint16_t regId, uint16_t *value);

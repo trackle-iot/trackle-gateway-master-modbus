@@ -41,6 +41,8 @@ static uint16_t mbInterCmdsDelayMs = 10;
 static uint8_t mbReadPeriod = 1;
 static uint8_t mbBitPosition = 0; // 0: msb, 1: lsb
 
+static void (*mbRequestFailedCallback)() = NULL;
+
 static bool numberToString(uint16_t *num, const RegisterAccessData_t *rad, char *valueString, int valueStringBuffLen)
 {
     double value = 0;
@@ -93,6 +95,8 @@ static RegError_t readTypedRegister(RegisterAccessData_t *rad, char *valueString
     uint16_t rawRegValue[MAX_REG_LENGTH] = {0};
     if (Trackle_Modbus_execute_command(rad->readFunction, rad->slaveAddr, rad->regId, rad->regNumber, &rawRegValue) != MODBUS_OK)
     {
+        if (mbRequestFailedCallback != NULL)
+            mbRequestFailedCallback();
         vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
         return RegError_MB_READ_ERR;
     }
@@ -217,8 +221,12 @@ static void monitoredRegistersTask(void *args)
 }
 
 bool MbRtu_init(uart_port_t uartPort, int baudrate, uint8_t txPin, uint8_t rxPin, bool onRS485, uint8_t dirPin, uint16_t interCmdsDelayMs,
-                uint8_t readPeriod, uint8_t serialDataBits, uint8_t serialParity, uint8_t serialStopBits, uint8_t bitPosition)
+                uint8_t readPeriod, uint8_t serialDataBits, uint8_t serialParity, uint8_t serialStopBits, uint8_t bitPosition,
+                void (*mbReqFailedCallback)())
 {
+    // Save modbus request failure callback
+    mbRequestFailedCallback = mbReqFailedCallback;
+
     // Init semaphore dedicated to modbus
     mbSem = xSemaphoreCreateBinaryStatic(&mbSemBuffer);
     configASSERT(mbSem != NULL);
@@ -496,6 +504,8 @@ RegError_t MbRtu_writeTypedRegisterByName(char *regName, char *valueString)
 
     if (Trackle_Modbus_execute_command(rad.writeFunction, rad.slaveAddr, rad.regId, rad.regNumber, rawRegValue) != MODBUS_OK)
     {
+        if (mbRequestFailedCallback != NULL)
+            mbRequestFailedCallback();
         vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
         UNLOCK_OR_ABORT(mbSem);
         return RegError_MB_WRITE_ERR;
@@ -518,6 +528,8 @@ RegError_t MbRtu_readRawRegisterByAddr(uint8_t readFunction, uint8_t slaveAddr, 
 
     if (Trackle_Modbus_execute_command(readFunction, slaveAddr, regId, 1, value) != MODBUS_OK)
     {
+        if (mbRequestFailedCallback != NULL)
+            mbRequestFailedCallback();
         vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
         UNLOCK_OR_ABORT(mbSem);
         return RegError_MB_READ_ERR;
@@ -540,6 +552,8 @@ RegError_t MbRtu_writeRawRegisterByAddr(uint8_t writeFunction, uint8_t slaveAddr
 
     if (Trackle_Modbus_execute_command(writeFunction, slaveAddr, regId, 1, &value) != MODBUS_OK)
     {
+        if (mbRequestFailedCallback != NULL)
+            mbRequestFailedCallback();
         vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
         UNLOCK_OR_ABORT(mbSem);
         return RegError_MB_WRITE_ERR;
@@ -560,6 +574,8 @@ ModbusError MbRtu_forwardRequestToSlaves(TrackleModbusFunction function, uint8_t
     BLOCKING_LOCK_OR_ABORT(mbSem);
 
     ModbusError err = Trackle_Modbus_execute_command(function, slaveAddr, regId, size, value);
+    if (err != MODBUS_OK && mbRequestFailedCallback != NULL)
+        mbRequestFailedCallback();
     vTaskDelay(mbInterCmdsDelayMs / portTICK_PERIOD_MS);
 
     UNLOCK_OR_ABORT(mbSem);
