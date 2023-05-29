@@ -477,7 +477,7 @@ static int postSetRegisterLength(const char *args)
     sscanf(tokens[1], "%" PRIu8, &regLen);
 
     if (!KnownRegisters_setLength(regName, regLen))
-        return -6;
+        return -5;
 
     return 1;
 }

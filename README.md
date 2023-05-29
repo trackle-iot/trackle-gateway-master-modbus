@@ -17,6 +17,7 @@ Registers can be monitored:
 Furthermore, registers can be monitored for change (register must be already monitored):
 * Enable it using `EnableMonitorOnChange`;
 * Set change check interval using `SetRegisterChangeCheckInterval`;
+* Set modbus polling period using `SetMbReadPeriod`.
 
 If Modbus slave address and register ID are known, one can read and write a register by calling `ReadRawRegisterValue` and `WriteRawRegisterValue` without adding them with `AddRegister`. Obviously, in this case, the read and write operations can be performed only with raw 16bit unsigned integers as values, since the type of the register's content is not known to the system.
 
@@ -48,6 +49,12 @@ On write:
 
 ### raw
 Decimal unsigned 16 bit value contained in the register. During read and write, the value is used with no conversion.
+
+### float
+Floating point number stored in Modbus RTU registers by encoding it following the IEEE 754 standard.
+
+### string
+ASCII string saved in sequence of Modbus registers. Each Modbus register contains two characters in big-endian order.
 
 ## Methods
 This section contains the description of the methods available from Trackle's cloud.
@@ -111,6 +118,22 @@ Methods available through POST calls.
   * -5: bool parameter is not a valid boolean value;
   * -6: register name not found.
 
+#### SetRegisterLength
+* Description:
+  * Set number of Modbus RTU registers on slave that will hold the value of the specified register.
+* Argument format:
+  * `<name>,<length>`
+* Parameters:
+  * `<name>`: name of register.
+  * `<length>`: number of Modbus registers that will hold the value.
+* Return values:
+  * 1:  success;
+  * -1: argument too long;
+  * -2: too many parameters in argument;
+  * -3: pointer to argument is NULL;
+  * -4: wrong number of parameters;
+  * -5: if specified length is not compatible with register type or register doesn't exist.
+
 #### SetRegisterMaxPublishDelay
 * Description:
   * Set time after which the register's value must be pusblished since last publish. If delay is set to 0, this kind of publish is disabled.
@@ -161,6 +184,17 @@ Methods available through POST calls.
   * -4: wrong number of parameters;
   * -5: seconds is not a valid 32bit unsigned integer;
   * -6: register name not found, or register is not monitored on change.
+
+#### SetMbReadPeriod
+* Description:
+  * Set minimum period used for reading monitored registers.
+* Argument format:
+  * `<seconds>`
+* Parameters:
+  * `<seconds>`: number of seconds of the period.
+* Return values:
+  * 1:  success;
+  * -1: argument is not a valid period in seconds.
 
 #### MakeRegisterWritable
 * Description:
@@ -413,9 +447,10 @@ Methods available through GET calls.
 * Description:
   * Get register name by Modbus slave address and register identifier.
 * Argument format:
-  * `<slaveAddr>,<regId>`
+  * `<function>,<slaveAddr>,<regId>`
 * Parameters:
-  * `<slaveAddr>`: unsigned integer of address of the Modbus slave.
+  * `<function>`: Modbus read function specified on register creation;
+  * `<slaveAddr>`: unsigned integer of address of the Modbus slave;
   * `<regId>`: unsigned integer of register identifier.
 * Returns:
   * `{"register":<regId>,"address":<slaveAddr>,"name":"<name>"}`: `<name>` of the searched register, (`<regId>` and `<slaveAddr>` same as parameters). Empty if register not found. On error, an object containing only `"error"` key is returned, and its value is a string containig a description of the error occurred.
@@ -436,7 +471,8 @@ Methods available through GET calls.
     * `readPeriod`: period between monitored registers readings;
     * `dataBits`: number of bits in every UART symbol;
     * `stopBits`: number of bits for stop in UART;
-    * `parity`: kind of parity used by UART.
+    * `parity`: kind of parity used by UART;
+    * `bitPosition`: `msb`if Most Significant register comes first, `lsb`if Least Significant Register comes first. It makes sense only for multi-registers registers.
 
 #### GetNextModbusConfig
 * Description:
