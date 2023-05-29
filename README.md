@@ -76,7 +76,7 @@ Methods available through POST calls.
     * 4: Input Registers (FC=04)
   * `<slaveAddr>`: Modbus RTU address of the slave owning the register.
   * `<regId>`: Modbus RTU register index on the slave.
-  * `<type>`: type of the register, currently `raw` (for raw value of the register) or `number` (if scaling or offsetting is required).
+  * `<type>`: type of the register, currently `raw` (for raw value of the register), `number` (if scaling or offsetting is required), `float` or `string`.
 * Return values:
   * 1:  success;
   * -1: argument too long;
